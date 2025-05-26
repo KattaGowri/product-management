@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login | Premium Store</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                  url('https://images.unsplash.com/photo-1605902711622-cfb43c4437b2?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+      background-size: cover;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .login-box {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      max-width: 460px;
+      width: 100%;
+      text-align: center;
+      color: #333;
+    }
+
+    .login-box h2 {
+      margin-bottom: 1.5rem;
+      color: #1e3a8a;
+    }
+
+    .login-box select,
+    .login-box input {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.5rem 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    .login-box button[type="submit"] {
+      width: 100%;
+      padding: 0.8rem;
+      margin-top: 1rem;
+      background: #1e3a8a;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .login-box button[type="submit"]:hover {
+      background: #154080;
+    }
+
+    .error-message {
+      color: red;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .link-text {
+      display: inline-block;
+      margin: 0.7rem 0.5rem 0 0.5rem;
+      font-size: 0.95rem;
+      color: #1e3a8a;
+      cursor: pointer;
+      text-decoration: underline;
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: inherit;
+    }
+    .link-text:hover {
+      color: #154080;
+    }
+
+    .section {
+      display: none;
+      text-align: left;
+      margin-top: 1.2rem;
+      border-top: 1px solid #ddd;
+      padding-top: 1rem;
+      color: #333;
+    }
+
+    .section h3 {
+      margin-bottom: 0.5rem;
+      color: #1e3a8a;
+    }
+
+    .section input, .section select {
+      width: 100%;
+      padding: 0.7rem;
+      margin-bottom: 0.6rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    .section button {
+      background: #1e3a8a;
+      color: white;
+      border: none;
+      padding: 0.8rem;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+    }
+    .section button:hover {
+      background: #154080;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>Login to Premium Store</h2>
+
+    <!-- Login Form -->
+    <form id="loginForm">
+      <select id="role" required>
+        <option value="" disabled selected>Select Role</option>
+        <option value="admin">Admin</option>
+        <option value="user">User</option>
+      </select>
+      <input type="text" id="username" placeholder="Username" required autocomplete="off" />
+      <input type="password" id="password" placeholder="Password" required autocomplete="off" />
+      <button type="submit">Login</button>
+    </form>
+
+    <div id="errorMessage" class="error-message">Invalid credentials.</div>
+
+    <!-- Links for Create Account / Forgot Password -->
+    <div style="margin-top: 1rem; text-align: center;">
+      <button class="link-text" onclick="toggleSection('createAccountSection')">Create Account</button>
+      <button class="link-text" onclick="toggleSection('resetSection')">Forgot Password?</button>
+    </div>
+
+    <!-- Create Account Section -->
+    <div class="section" id="createAccountSection">
+      <h3>Create Account</h3>
+      <select id="createRole" required>
+        <option value="" disabled selected>Select Role</option>
+        <option value="admin">Admin</option>
+        <option value="user">User</option>
+      </select>
+      <input type="text" id="createUsername" placeholder="New Username" required autocomplete="off" />
+      <input type="password" id="createPassword" placeholder="New Password" required autocomplete="off" />
+      <input type="email" id="createEmail" placeholder="Email (for recovery)" required autocomplete="off" />
+      <button onclick="createAccount()">Create Account</button>
+    </div>
+
+    <!-- Reset Password Section -->
+    <div class="section" id="resetSection">
+      <h3>Reset Password</h3>
+      <select id="resetRole" required>
+        <option value="" disabled selected>Select Role</option>
+        <option value="admin">Admin</option>
+        <option value="user">User</option>
+      </select>
+      <input type="text" id="resetUsername" placeholder="Username" required autocomplete="off" />
+      <input type="email" id="resetEmail" placeholder="Registered Email" required autocomplete="off" />
+      <input type="password" id="resetPassword" placeholder="New Password" required autocomplete="off" />
+      <button onclick="resetPassword()">Reset Password</button>
+    </div>
+  </div>
+
+  <script>
+    // Utility function to get stored users from localStorage or initialize with default admin and user
+    function getUsers(role) {
+      let usersJSON = localStorage.getItem(role + "Users");
+      if (!usersJSON) {
+        // Initialize with default admin/user accounts
+        if (role === "admin") {
+          const defaultAdmin = [{ username: "admin", password: "admin123", email: "admin@shop.com" }];
+          localStorage.setItem("adminUsers", JSON.stringify(defaultAdmin));
+          return defaultAdmin;
+        } else if (role === "user") {
+          const defaultUser = [{ username: "user", password: "user123", email: "user@shop.com" }];
+          localStorage.setItem("userUsers", JSON.stringify(defaultUser));
+          return defaultUser;
+        }
+      }
+      return JSON.parse(localStorage.getItem(role + "Users")) || [];
+    }
+
+    function saveUsers(role, users) {
+      localStorage.setItem(role + "Users", JSON.stringify(users));
+    }
+
+    function toggleSection(sectionId) {
+      document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
+      const section = document.getElementById(sectionId);
+      if (section) section.style.display = 'block';
+      // Clear error message and inputs on toggle
+      errorMessage.style.display = 'none';
+      clearInputs(section);
+    }
+
+    function clearInputs(section) {
+      if (!section) return;
+      section.querySelectorAll('input').forEach(input => input.value = '');
+      section.querySelectorAll('select').forEach(sel => sel.selectedIndex = 0);
+    }
+
+    const loginForm = document.getElementById('loginForm');
+    const errorMessage = document.getElementById('errorMessage');
+
+    loginForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const role = document.getElementById('role').value;
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      if (!role) {
+        alert("Please select your role.");
+        return;
+      }
+
+      const users = getUsers(role);
+      const user = users.find(u => u.username === username && u.password === password);
+
+      if (user) {
+        localStorage.setItem(role + "LoggedInUser", username);
+        if (role === "admin") {
+          window.location.href = "admin.html";
+        } else {
+          window.location.href = "index.html";
+        }
+      } else {
+        errorMessage.style.display = "block";
+      }
+    });
+
+    function createAccount() {
+      const role = document.getElementById('createRole').value;
+      const username = document.getElementById('createUsername').value.trim();
+      const password = document.getElementById('createPassword').value.trim();
+      const email = document.getElementById('createEmail').value.trim();
+
+      if (!role || !username || !password || !email) {
+        alert("Please fill all fields.");
+        return;
+      }
+
+      let users = getUsers(role);
+      const exists = users.some(u => u.username === username);
+
+      if (exists) {
+        alert("Username already exists. Please choose another.");
+        return;
+      }
+
+      users.push({ username, password, email });
+      saveUsers(role, users);
+      alert(`${role.charAt(0).toUpperCase() + role.slice(1)} account created successfully!`);
+      toggleSection(null);
+    }
+
+    function resetPassword() {
+      const role = document.getElementById('resetRole').value;
+      const username = document.getElementById('resetUsername').value.trim();
+      const email = document.getElementById('resetEmail').value.trim();
+      const newPassword = document.getElementById('resetPassword').value.trim();
+
+      if (!role || !username || !email || !newPassword) {
+        alert("Please fill all fields.");
+        return;
+      }
+
+      let users = getUsers(role);
+      const userIndex = users.findIndex(u => u.username === username && u.email === email);
+
+      if (userIndex === -1) {
+        alert("Invalid username or email.");
+        return;
+      }
+
+      users[userIndex].password = newPassword;
+      saveUsers(role, users);
+      alert("Password reset successful!");
+      toggleSection(null);
+    }
+  </script>
+</body>
+</html>

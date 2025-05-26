@@ -1,0 +1,1806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Panel - Complete Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #4895ef;
+            --dark: #212529;
+            --light: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; 
+            padding: 0;
+            background: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+            background-size: cover;
+            color: var(--dark);
+        }
+        
+        .overlay {
+            background-color: rgba(255,255,255,0.92);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .view-store-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .logout-btn:hover {
+            background-color: #d1146a;
+        }
+        
+        .view-store-btn:hover {
+            background-color: #3aa8d1;
+        }
+        
+        h1 {
+            margin: 0;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 20px;
+            height: fit-content;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .sidebar-menu a.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+        
+        .main-content {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-card .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 10px 0;
+            color: var(--primary);
+        }
+        
+        .stat-card .stat-label {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .stat-card .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .card-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        th {
+            background: rgba(0,0,0,0.02);
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        
+        tr:hover {
+            background: rgba(0,0,0,0.02);
+        }
+        
+        img.product-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+        
+        .badge-danger {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+        
+        .badge-warning {
+            background: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+        
+        .badge-primary {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+        
+        .action-btn {
+            border: none;
+            border-radius: 4px;
+            padding: 6px 10px;
+            margin-right: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .edit-btn {
+            background-color: var(--info);
+        }
+        
+        .delete-btn {
+            background-color: var(--danger);
+        }
+        
+        .view-btn {
+            background-color: var(--success);
+        }
+        
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #6c757d;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .status-active {
+            color: var(--success);
+            font-weight: 600;
+        }
+        
+        .status-inactive {
+            color: var(--danger);
+            font-weight: 600;
+        }
+        
+        .rating {
+            color: var(--warning);
+        }
+        
+        .access-denied {
+            text-align: center;
+            padding: 40px;
+            color: var(--danger);
+        }
+        
+        .access-denied i {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 992px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+            
+            .admin-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay">
+        <div class="admin-header">
+            <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+            <div class="header-actions">
+                <a href="index.html" class="view-store-btn">
+                    <i class="fas fa-store"></i> View Store
+                </a>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+        
+        <div class="dashboard-container">
+            <div class="sidebar">
+                <ul class="sidebar-menu">
+                    <li><a href="#" class="active" onclick="showTab('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="#" onclick="showTab('products')" id="products-tab"><i class="fas fa-box-open"></i> Products</a></li>
+                    <li><a href="#" onclick="showTab('bookings')" id="bookings-tab"><i class="fas fa-calendar-check"></i> Bookings</a></li>
+                    <li><a href="#" onclick="showTab('payments')" id="payments-tab"><i class="fas fa-credit-card"></i> Payments</a></li>
+                    <li><a href="#" onclick="showTab('carts')" id="carts-tab"><i class="fas fa-shopping-cart"></i> Shopping Carts</a></li>
+                    <li><a href="#" onclick="showTab('analytics')" id="analytics-tab"><i class="fas fa-chart-line"></i> Analytics</a></li>
+                    <li><a href="#" onclick="showTab('users')" id="users-tab"><i class="fas fa-users"></i> Users</a></li>
+                </ul>
+            </div>
+            
+            <div class="main-content">
+                <!-- Dashboard Tab -->
+                <div id="dashboard" class="tab-content active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: var(--primary);">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="stat-value" id="total-products">0</div>
+                            <div class="stat-label">Total Products</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: var(--success);">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="stat-value" id="total-bookings">0</div>
+                            <div class="stat-label">Total Bookings</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: var(--info);">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <div class="stat-value" id="total-revenue">₹0</div>
+                            <div class="stat-label">Total Revenue</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: var(--warning);">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="stat-value" id="active-carts">0</div>
+                            <div class="stat-label">Active Carts</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="margin-top: 20px;">
+                        <div class="card-header">
+                            <h3 class="card-title">Recent Bookings</h3>
+                            <a href="#" onclick="showTab('bookings')" style="font-size: 14px;">View All</a>
+                        </div>
+                        <table id="recent-bookings">
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Customer</th>
+                                    <th>Product</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="card" style="margin-top: 20px;">
+                        <div class="card-header">
+                            <h3 class="card-title">Sales Analytics (Last 30 Days)</h3>
+                        </div>
+                        <div class="chart-container" id="sales-chart">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Products Tab -->
+                <div id="products" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Product Management</h3>
+                            <button class="btn btn-primary" onclick="showAddProductForm()" id="add-product-btn">
+                                <i class="fas fa-plus"></i> Add Product
+                            </button>
+                        </div>
+                        
+                        <div id="product-form-container" style="display: none; margin-bottom: 20px;">
+                            <form id="productForm">
+                                <input type="hidden" id="product-index" value="">
+                                <div class="form-group">
+                                    <label for="name">Product Name</label>
+                                    <input type="text" id="name" class="form-control" placeholder="Enter product name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="description">Description</label>
+                                    <textarea id="description" class="form-control" rows="3" placeholder="Enter product description" required></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="category">Category</label>
+                                    <input type="text" id="category" class="form-control" placeholder="Enter category" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="price">Price (₹)</label>
+                                    <input type="number" id="price" class="form-control" placeholder="Enter price" min="0" step="0.01" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="image">Image URL</label>
+                                    <input type="url" id="image" class="form-control" placeholder="http://127.0.0.1:5000/static/uploads/your_image.jpg" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="status">Status</label>
+                                    <select id="status" class="form-control" required>
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="rating">Rating (1-5)</label>
+                                    <input type="number" id="rating" class="form-control" placeholder="Enter rating" min="1" max="5" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block">
+                                    <i class="fas fa-save"></i> Save Product
+                                </button>
+                                <button type="button" class="btn btn-block" style="margin-top: 10px; background: #f8f9fa;" onclick="cancelProductForm()">
+                                    Cancel
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <table id="products-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Image</th>
+                                    <th>Status</th>
+                                    <th>Rating</th>
+                                    <th>Bookings</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Bookings Tab -->
+                <div id="bookings" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Booking Management</h3>
+                        </div>
+                        <div class="tab-container">
+                            <div class="tabs">
+                                <div class="tab active" onclick="filterBookings('all')">All</div>
+                                <div class="tab" onclick="filterBookings('confirmed')">Confirmed</div>
+                                <div class="tab" onclick="filterBookings('pending')">Pending</div>
+                                <div class="tab" onclick="filterBookings('cancelled')">Cancelled</div>
+                            </div>
+                        </div>
+                        <table id="bookings-table">
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Customer</th>
+                                    <th>Product</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Payment</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Payments Tab -->
+                <div id="payments" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Payment Records</h3>
+                        </div>
+                        <div class="tab-container">
+                            <div class="tabs">
+                                <div class="tab active" onclick="filterPayments('all')">All</div>
+                                <div class="tab" onclick="filterPayments('successful')">Successful</div>
+                                <div class="tab" onclick="filterPayments('failed')">Failed</div>
+                                <div class="tab" onclick="filterPayments('refunded')">Refunded</div>
+                            </div>
+                        </div>
+                        <table id="payments-table">
+                            <thead>
+                                <tr>
+                                    <th>Payment ID</th>
+                                    <th>Booking ID</th>
+                                    <th>Customer</th>
+                                    <th>Amount</th>
+                                    <th>Method</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Carts Tab -->
+                <div id="carts" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Shopping Carts</h3>
+                        </div>
+                        <table id="carts-table">
+                            <thead>
+                                <tr>
+                                    <th>Cart ID</th>
+                                    <th>Customer</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                    <th>Last Updated</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Analytics Tab -->
+                <div id="analytics" class="tab-content">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: var(--primary);">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="stat-value" id="monthly-sales">₹0</div>
+                            <div class="stat-label">Monthly Sales</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: var(--success);">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <div class="stat-value" id="conversion-rate">0%</div>
+                            <div class="stat-label">Conversion Rate</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: var(--info);">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-value" id="new-customers">0</div>
+                            <div class="stat-label">New Customers</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: var(--warning);">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="stat-value" id="top-product">-</div>
+                            <div class="stat-label">Top Product</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="margin-top: 20px;">
+                        <div class="card-header">
+                            <h3 class="card-title">Revenue Trends</h3>
+                            <div>
+                                <button class="btn" style="padding: 5px 10px; font-size: 12px;" onclick="updateChart('week')">Week</button>
+                                <button class="btn" style="padding: 5px 10px; font-size: 12px;" onclick="updateChart('month')">Month</button>
+                                <button class="btn" style="padding: 5px 10px; font-size: 12px;" onclick="updateChart('year')">Year</button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="margin-top: 20px;">
+                        <div class="card-header">
+                            <h3 class="card-title">Product Performance</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="productChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Users Tab -->
+                <div id="users" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">User Management</h3>
+                            <button class="btn btn-primary" id="add-user-btn">
+                                <i class="fas fa-plus"></i> Add User
+                            </button>
+                        </div>
+                        <table id="users-table">
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Joined</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Initialize data
+        if (!localStorage.getItem('products')) {
+            const defaultProducts = [
+                {
+                    id: Date.now() + 1,
+                    name: 'Wireless Headphones',
+                    description: 'Premium noise-cancelling wireless headphones with 30hr battery life',
+                    category: 'Electronics',
+                    price: 1999.99,
+                    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80',
+                    status: 'active',
+                    rating: 4,
+                    bookings: 12
+                },
+                {
+                    id: Date.now() + 2,
+                    name: 'Leather Jacket',
+                    description: 'Genuine leather jacket with premium stitching',
+                    category: 'Clothing',
+                    price: 2999.99,
+                    image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=500&q=80',
+                    status: 'active',
+                    rating: 5,
+                    bookings: 8
+                },
+                {
+                    id: Date.now() + 3,
+                    name: 'Smart Watch',
+                    description: 'Fitness tracker with heart rate monitor and GPS',
+                    category: 'Electronics',
+                    price: 2499.99,
+                    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80',
+                    status: 'active',
+                    rating: 4,
+                    bookings: 15
+                }
+            ];
+            localStorage.setItem('products', JSON.stringify(defaultProducts));
+        }
+
+        if (!localStorage.getItem('bookings')) {
+            const defaultBookings = [
+                {
+                    id: 'BK-' + Date.now().toString().slice(-6),
+                    customerId: 'CUST001',
+                    customerName: 'John Doe',
+                    productId: Date.now() + 1,
+                    productName: 'Wireless Headphones',
+                    date: new Date().toISOString(),
+                    amount: 1999.99,
+                    paymentId: 'PAY-' + Date.now().toString().slice(-6),
+                    paymentStatus: 'successful',
+                    status: 'confirmed',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 'BK-' + (Date.now() + 1).toString().slice(-6),
+                    customerId: 'CUST002',
+                    customerName: 'Jane Smith',
+                    productId: Date.now() + 2,
+                    productName: 'Leather Jacket',
+                    date: new Date(Date.now() - 86400000).toISOString(),
+                    amount: 2999.99,
+                    paymentId: 'PAY-' + (Date.now() + 1).toString().slice(-6),
+                    paymentStatus: 'successful',
+                    status: 'confirmed',
+                    createdAt: new Date(Date.now() - 86400000).toISOString()
+                },
+                {
+                    id: 'BK-' + (Date.now() + 2).toString().slice(-6),
+                    customerId: 'CUST003',
+                    customerName: 'Robert Johnson',
+                    productId: Date.now() + 3,
+                    productName: 'Smart Watch',
+                    date: new Date(Date.now() - 172800000).toISOString(),
+                    amount: 2499.99,
+                    paymentId: 'PAY-' + (Date.now() + 2).toString().slice(-6),
+                    paymentStatus: 'pending',
+                    status: 'pending',
+                    createdAt: new Date(Date.now() - 172800000).toISOString()
+                }
+            ];
+            localStorage.setItem('bookings', JSON.stringify(defaultBookings));
+        }
+
+        if (!localStorage.getItem('payments')) {
+            const defaultPayments = [
+                {
+                    id: 'PAY-' + Date.now().toString().slice(-6),
+                    bookingId: 'BK-' + Date.now().toString().slice(-6),
+                    customerId: 'CUST001',
+                    customerName: 'John Doe',
+                    amount: 1999.99,
+                    method: 'Credit Card',
+                    date: new Date().toISOString(),
+                    status: 'successful',
+                    transactionId: 'TXN' + Math.random().toString(36).substring(2, 10).toUpperCase()
+                },
+                {
+                    id: 'PAY-' + (Date.now() + 1).toString().slice(-6),
+                    bookingId: 'BK-' + (Date.now() + 1).toString().slice(-6),
+                    customerId: 'CUST002',
+                    customerName: 'Jane Smith',
+                    amount: 2999.99,
+                    method: 'PayPal',
+                    date: new Date(Date.now() - 86400000).toISOString(),
+                    status: 'successful',
+                    transactionId: 'TXN' + Math.random().toString(36).substring(2, 10).toUpperCase()
+                },
+                {
+                    id: 'PAY-' + (Date.now() + 2).toString().slice(-6),
+                    bookingId: 'BK-' + (Date.now() + 2).toString().slice(-6),
+                    customerId: 'CUST003',
+                    customerName: 'Robert Johnson',
+                    amount: 2499.99,
+                    method: 'Credit Card',
+                    date: new Date(Date.now() - 172800000).toISOString(),
+                    status: 'pending',
+                    transactionId: 'TXN' + Math.random().toString(36).substring(2, 10).toUpperCase()
+                }
+            ];
+            localStorage.setItem('payments', JSON.stringify(defaultPayments));
+        }
+
+        if (!localStorage.getItem('carts')) {
+            const defaultCarts = [
+                {
+                    id: 'CART-' + Date.now().toString().slice(-6),
+                    customerId: 'CUST004',
+                    customerName: 'Alice Williams',
+                    items: [
+                        { productId: Date.now() + 1, name: 'Wireless Headphones', quantity: 1, price: 1999.99 },
+                        { productId: Date.now() + 3, name: 'Smart Watch', quantity: 2, price: 2499.99 }
+                    ],
+                    total: 6999.97,
+                    lastUpdated: new Date().toISOString(),
+                    status: 'active'
+                },
+                {
+                    id: 'CART-' + (Date.now() + 1).toString().slice(-6),
+                    customerId: 'CUST005',
+                    customerName: 'Michael Brown',
+                    items: [
+                        { productId: Date.now() + 2, name: 'Leather Jacket', quantity: 1, price: 2999.99 }
+                    ],
+                    total: 2999.99,
+                    lastUpdated: new Date(Date.now() - 3600000).toISOString(),
+                    status: 'active'
+                },
+                {
+                    id: 'CART-' + (Date.now() + 2).toString().slice(-6),
+                    customerId: 'CUST006',
+                    customerName: 'Sarah Davis',
+                    items: [],
+                    total: 0,
+                    lastUpdated: new Date(Date.now() - 86400000).toISOString(),
+                    status: 'abandoned'
+                }
+            ];
+            localStorage.setItem('carts', JSON.stringify(defaultCarts));
+        }
+
+        if (!localStorage.getItem('users')) {
+            const defaultUsers = [
+                {
+                    id: 'ADM001',
+                    name: 'Admin User',
+                    email: 'admin@example.com',
+                    role: 'admin',
+                    joined: '2023-01-01',
+                    status: 'active',
+                    permissions: ['all']
+                },
+                {
+                    id: 'MGR001',
+                    name: 'Manager User',
+                    email: 'manager@example.com',
+                    role: 'manager',
+                    joined: '2023-02-15',
+                    status: 'active',
+                    permissions: ['products', 'bookings', 'payments', 'analytics']
+                },
+                {
+                    id: 'USR001',
+                    name: 'John Doe',
+                    email: 'john@example.com',
+                    role: 'customer',
+                    joined: '2023-05-15',
+                    status: 'active',
+                    permissions: []
+                }
+            ];
+            localStorage.setItem('users', JSON.stringify(defaultUsers));
+        }
+
+        if (!localStorage.getItem('currentUser')) {
+            // Default to admin user if no current user is logged in (for demo purposes)
+            localStorage.setItem('currentUser', JSON.stringify({
+                id: 'ADM001',
+                name: 'Admin User',
+                email: 'admin@example.com',
+                role: 'admin',
+                permissions: ['all']
+            }));
+        }
+
+        // Load data
+        let products = JSON.parse(localStorage.getItem('products')) || [];
+        let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+        let payments = JSON.parse(localStorage.getItem('payments')) || [];
+        let carts = JSON.parse(localStorage.getItem('carts')) || [];
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
+
+        // DOM elements
+        const productForm = document.getElementById('productForm');
+        const productFormContainer = document.getElementById('product-form-container');
+        const productsTable = document.querySelector('#products-table tbody');
+        const bookingsTable = document.querySelector('#bookings-table tbody');
+        const paymentsTable = document.querySelector('#payments-table tbody');
+        const cartsTable = document.querySelector('#carts-table tbody');
+        const usersTable = document.querySelector('#users-table tbody');
+        const recentBookingsTable = document.querySelector('#recent-bookings tbody');
+
+        // Chart variables
+        let salesChart, revenueChart, productChart;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            setupAccessControl();
+            renderDashboardStats();
+            renderProducts();
+            renderBookings();
+            renderPayments();
+            renderCarts();
+            renderUsers();
+            renderRecentBookings();
+            initCharts();
+            
+            // Check for new bookings and carts from users
+            checkForNewData();
+        });
+
+        // Check for new data added by users
+        function checkForNewData() {
+            // This would be replaced with actual API calls or real-time updates in a real application
+            // For demo purposes, we'll just reload from localStorage
+            products = JSON.parse(localStorage.getItem('products')) || [];
+            bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            carts = JSON.parse(localStorage.getItem('carts')) || [];
+            
+            renderDashboardStats();
+            renderProducts();
+            renderBookings();
+            renderCarts();
+            renderRecentBookings();
+            updateCharts();
+        }
+
+        // Setup access control based on user role
+        function setupAccessControl() {
+            const tabs = {
+                'products-tab': 'products',
+                'bookings-tab': 'bookings',
+                'payments-tab': 'payments',
+                'carts-tab': 'carts',
+                'analytics-tab': 'analytics',
+                'users-tab': 'users'
+            };
+
+            // Check if user has 'all' permissions
+            if (currentUser.permissions && currentUser.permissions.includes('all')) {
+                return; // Full access
+            }
+
+            // Disable tabs based on permissions
+            for (const [tabId, permission] of Object.entries(tabs)) {
+                const tabElement = document.getElementById(tabId);
+                if (tabElement && currentUser.permissions && !currentUser.permissions.includes(permission)) {
+                    tabElement.classList.add('disabled');
+                }
+            }
+
+            // Disable buttons based on permissions
+            if (currentUser.permissions && !currentUser.permissions.includes('all') && !currentUser.permissions.includes('products')) {
+                const addProductBtn = document.getElementById('add-product-btn');
+                if (addProductBtn) addProductBtn.style.display = 'none';
+            }
+
+            if (currentUser.permissions && !currentUser.permissions.includes('all') && !currentUser.permissions.includes('users')) {
+                const addUserBtn = document.getElementById('add-user-btn');
+                if (addUserBtn) addUserBtn.style.display = 'none';
+            }
+        }
+
+        // Check if user has permission to access a feature
+        function hasPermission(feature) {
+            return currentUser.permissions && (currentUser.permissions.includes('all') || currentUser.permissions.includes(feature));
+        }
+
+        // Tab navigation
+        function showTab(tabId) {
+            // Check permission
+            if (tabId !== 'dashboard' && !hasPermission(tabId)) {
+                alert('You do not have permission to access this section');
+                return;
+            }
+
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // Update active tab in sidebar
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Find and activate the corresponding sidebar link
+            const sidebarLink = Array.from(document.querySelectorAll('.sidebar-menu a')).find(link => {
+                return link.getAttribute('onclick').includes(tabId);
+            });
+            
+            if (sidebarLink) {
+                sidebarLink.classList.add('active');
+            }
+            
+            // Update charts when analytics tab is shown
+            if (tabId === 'analytics') {
+                updateCharts();
+            }
+        }
+
+        // Product management
+        function showAddProductForm() {
+            if (!hasPermission('products')) {
+                alert('You do not have permission to add products');
+                return;
+            }
+            
+            productFormContainer.style.display = 'block';
+            productForm.reset();
+            document.getElementById('product-index').value = '';
+            window.scrollTo({top: productFormContainer.offsetTop, behavior: 'smooth'});
+        }
+
+        function cancelProductForm() {
+            productFormContainer.style.display = 'none';
+            productForm.reset();
+        }
+
+        productForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!hasPermission('products')) {
+                alert('You do not have permission to modify products');
+                return;
+            }
+            
+            const productData = {
+                id: document.getElementById('product-index').value 
+                    ? products[parseInt(document.getElementById('product-index').value)].id 
+                    : Date.now(),
+                name: document.getElementById('name').value,
+                description: document.getElementById('description').value,
+                category: document.getElementById('category').value,
+                price: parseFloat(document.getElementById('price').value),
+                image: document.getElementById('image').value,
+                status: document.getElementById('status').value,
+                rating: parseInt(document.getElementById('rating').value),
+                bookings: document.getElementById('product-index').value 
+                    ? products[parseInt(document.getElementById('product-index').value)].bookings || 0
+                    : 0
+            };
+            
+            if (document.getElementById('product-index').value) {
+                // Update existing product
+                const index = parseInt(document.getElementById('product-index').value);
+                products[index] = productData;
+            } else {
+                // Add new product
+                products.push(productData);
+            }
+            
+            localStorage.setItem('products', JSON.stringify(products));
+            renderProducts();
+            cancelProductForm();
+            renderDashboardStats();
+            updateCharts();
+        });
+
+        function renderProducts() {
+            productsTable.innerHTML = '';
+            
+            products.forEach((product, index) => {
+                const row = document.createElement('tr');
+                
+                let actions = '';
+                if (hasPermission('products')) {
+                    actions = `
+                        <button class="action-btn edit-btn" onclick="editProduct(${index})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteProduct(${index})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    `;
+                } else {
+                    actions = '<span class="text-muted">No actions available</span>';
+                }
+                
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>${product.category}</td>
+                    <td>₹${product.price.toFixed(2)}</td>
+                    <td><img class="product-img" src="${product.image}" alt="${product.name}"></td>
+                    <td><span class="${product.status === 'active' ? 'status-active' : 'status-inactive'}">${product.status}</span></td>
+                    <td><span class="rating">${'★'.repeat(product.rating)}${'☆'.repeat(5 - product.rating)}</span></td>
+                    <td>${product.bookings || 0}</td>
+                    <td>${actions}</td>
+                `;
+                productsTable.appendChild(row);
+            });
+        }
+
+        function editProduct(index) {
+            if (!hasPermission('products')) {
+                alert('You do not have permission to edit products');
+                return;
+            }
+            
+            const product = products[index];
+            document.getElementById('product-index').value = index;
+            document.getElementById('name').value = product.name;
+            document.getElementById('description').value = product.description;
+            document.getElementById('category').value = product.category;
+            document.getElementById('price').value = product.price;
+            document.getElementById('image').value = product.image;
+            document.getElementById('status').value = product.status;
+            document.getElementById('rating').value = product.rating;
+            
+            productFormContainer.style.display = 'block';
+            productForm.querySelector('button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> Update Product';
+            window.scrollTo({top: productFormContainer.offsetTop, behavior: 'smooth'});
+        }
+
+        function deleteProduct(index) {
+            if (!hasPermission('products')) {
+                alert('You do not have permission to delete products');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete "${products[index].name}"?`)) {
+                products.splice(index, 1);
+                localStorage.setItem('products', JSON.stringify(products));
+                renderProducts();
+                renderDashboardStats();
+                updateCharts();
+            }
+        }
+
+        // Booking management
+        function filterBookings(filter) {
+            if (!hasPermission('bookings')) {
+                alert('You do not have permission to view bookings');
+                return;
+            }
+            
+            // Update active tab
+            document.querySelectorAll('#bookings .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderBookings(filter);
+        }
+
+        function renderBookings(filter = 'all') {
+            bookingsTable.innerHTML = '';
+            
+            if (!hasPermission('bookings')) {
+                bookingsTable.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="access-denied">
+                            <i class="fas fa-lock"></i>
+                            <h3>Access Denied</h3>
+                            <p>You do not have permission to view bookings</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let filteredBookings = bookings;
+            if (filter !== 'all') {
+                filteredBookings = bookings.filter(booking => booking.status === filter);
+            }
+            
+            filteredBookings.forEach(booking => {
+                const product = products.find(p => p.id === booking.productId);
+                const row = document.createElement('tr');
+                
+                let statusBadge = '';
+                if (booking.status === 'confirmed') {
+                    statusBadge = '<span class="badge badge-success">Confirmed</span>';
+                } else if (booking.status === 'pending') {
+                    statusBadge = '<span class="badge badge-warning">Pending</span>';
+                } else {
+                    statusBadge = '<span class="badge badge-danger">Cancelled</span>';
+                }
+                
+                let paymentBadge = '';
+                if (booking.paymentStatus === 'successful') {
+                    paymentBadge = '<span class="badge badge-success">Successful</span>';
+                } else if (booking.paymentStatus === 'pending') {
+                    paymentBadge = '<span class="badge badge-warning">Pending</span>';
+                } else {
+                    paymentBadge = '<span class="badge badge-danger">Failed</span>';
+                }
+                
+                let actions = '';
+                if (hasPermission('bookings')) {
+                    actions = `
+                        <button class="action-btn view-btn" onclick="viewBookingDetails('${booking.id}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        ${booking.status !== 'confirmed' ? `
+                        <button class="action-btn edit-btn" onclick="confirmBooking('${booking.id}')">
+                            <i class="fas fa-check"></i> Confirm
+                        </button>
+                        ` : ''}
+                        ${booking.status !== 'cancelled' ? `
+                        <button class="action-btn delete-btn" onclick="cancelBooking('${booking.id}')">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        ` : ''}
+                    `;
+                }
+                
+                row.innerHTML = `
+                    <td>${booking.id}</td>
+                    <td>${booking.customerName}</td>
+                    <td>${product ? product.name : booking.productName}</td>
+                    <td>${new Date(booking.date).toLocaleDateString()}</td>
+                    <td>₹${booking.amount.toFixed(2)}</td>
+                    <td>${paymentBadge}</td>
+                    <td>${statusBadge}</td>
+                    <td>${actions}</td>
+                `;
+                bookingsTable.appendChild(row);
+            });
+        }
+
+        function viewBookingDetails(bookingId) {
+            if (!hasPermission('bookings')) {
+                alert('You do not have permission to view booking details');
+                return;
+            }
+            
+            const booking = bookings.find(b => b.id === bookingId);
+            if (booking) {
+                const product = products.find(p => p.id === booking.productId);
+                const payment = payments.find(p => p.id === booking.paymentId);
+                
+                let details = `Booking Details:\n\n`;
+                details += `ID: ${booking.id}\n`;
+                details += `Customer: ${booking.customerName}\n`;
+                details += `Product: ${product ? product.name : booking.productName}\n`;
+                details += `Date: ${new Date(booking.date).toLocaleDateString()}\n`;
+                details += `Amount: ₹${booking.amount.toFixed(2)}\n`;
+                details += `Status: ${booking.status}\n`;
+                details += `Payment Status: ${booking.paymentStatus}\n`;
+                
+                if (payment) {
+                    details += `\nPayment Details:\n`;
+                    details += `Method: ${payment.method}\n`;
+                    details += `Transaction ID: ${payment.transactionId || 'N/A'}\n`;
+                }
+                
+                alert(details);
+            }
+        }
+
+        function confirmBooking(bookingId) {
+            if (!hasPermission('bookings')) {
+                alert('You do not have permission to confirm bookings');
+                return;
+            }
+            
+            const bookingIndex = bookings.findIndex(b => b.id === bookingId);
+            if (bookingIndex !== -1) {
+                bookings[bookingIndex].status = 'confirmed';
+                bookings[bookingIndex].paymentStatus = 'successful';
+                
+                // Update corresponding payment if exists
+                const paymentIndex = payments.findIndex(p => p.id === bookings[bookingIndex].paymentId);
+                if (paymentIndex !== -1) {
+                    payments[paymentIndex].status = 'successful';
+                    localStorage.setItem('payments', JSON.stringify(payments));
+                }
+                
+                localStorage.setItem('bookings', JSON.stringify(bookings));
+                renderBookings();
+                renderDashboardStats();
+                renderRecentBookings();
+                updateCharts();
+            }
+        }
+
+        function cancelBooking(bookingId) {
+            if (!hasPermission('bookings')) {
+                alert('You do not have permission to cancel bookings');
+                return;
+            }
+            
+            const bookingIndex = bookings.findIndex(b => b.id === bookingId);
+            if (bookingIndex !== -1) {
+                bookings[bookingIndex].status = 'cancelled';
+                
+                // Update corresponding payment if exists
+                const paymentIndex = payments.findIndex(p => p.id === bookings[bookingIndex].paymentId);
+                if (paymentIndex !== -1) {
+                    payments[paymentIndex].status = 'refunded';
+                    localStorage.setItem('payments', JSON.stringify(payments));
+                }
+                
+                localStorage.setItem('bookings', JSON.stringify(bookings));
+                renderBookings();
+                renderDashboardStats();
+                renderRecentBookings();
+                updateCharts();
+            }
+        }
+
+        // Payment management
+        function filterPayments(filter) {
+            if (!hasPermission('payments')) {
+                alert('You do not have permission to view payments');
+                return;
+            }
+            
+            // Update active tab
+            document.querySelectorAll('#payments .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderPayments(filter);
+        }
+
+        function renderPayments(filter = 'all') {
+            paymentsTable.innerHTML = '';
+            
+            if (!hasPermission('payments')) {
+                paymentsTable.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="access-denied">
+                            <i class="fas fa-lock"></i>
+                            <h3>Access Denied</h3>
+                            <p>You do not have permission to view payments</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let filteredPayments = payments;
+            if (filter !== 'all') {
+                filteredPayments = payments.filter(payment => payment.status === filter);
+            }
+            
+            filteredPayments.forEach(payment => {
+                let statusBadge = '';
+                if (payment.status === 'successful') {
+                    statusBadge = '<span class="badge badge-success">Successful</span>';
+                } else if (payment.status === 'pending') {
+                    statusBadge = '<span class="badge badge-warning">Pending</span>';
+                } else if (payment.status === 'refunded') {
+                    statusBadge = '<span class="badge badge-primary">Refunded</span>';
+                } else {
+                    statusBadge = '<span class="badge badge-danger">Failed</span>';
+                }
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${payment.id}</td>
+                    <td>${payment.bookingId}</td>
+                    <td>${payment.customerName}</td>
+                    <td>₹${payment.amount.toFixed(2)}</td>
+                    <td>${payment.method}</td>
+                    <td>${new Date(payment.date).toLocaleDateString()}</td>
+                    <td>${statusBadge}</td>
+                `;
+                paymentsTable.appendChild(row);
+            });
+        }
+
+        // Cart management
+        function renderCarts() {
+            cartsTable.innerHTML = '';
+            
+            if (!hasPermission('carts')) {
+                cartsTable.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="access-denied">
+                            <i class="fas fa-lock"></i>
+                            <h3>Access Denied</h3>
+                            <p>You do not have permission to view shopping carts</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            carts.forEach(cart => {
+                let statusBadge = '';
+                if (cart.status === 'active') {
+                    statusBadge = '<span class="badge badge-success">Active</span>';
+                } else if (cart.status === 'abandoned') {
+                    statusBadge = '<span class="badge badge-danger">Abandoned</span>';
+                } else {
+                    statusBadge = '<span class="badge badge-warning">Completed</span>';
+                }
+                
+                let itemsList = '';
+                if (cart.items && cart.items.length > 0) {
+                    itemsList = cart.items.map(item => 
+                        `${item.quantity} × ${item.name} (₹${item.price.toFixed(2)})`
+                    ).join('<br>');
+                } else {
+                    itemsList = 'No items';
+                }
+                
+                let actions = '';
+                if (hasPermission('carts')) {
+                    actions = `
+                        <button class="action-btn view-btn" onclick="viewCartDetails('${cart.id}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    `;
+                }
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${cart.id}</td>
+                    <td>${cart.customerName}</td>
+                    <td>${itemsList}</td>
+                    <td>₹${cart.total.toFixed(2)}</td>
+                    <td>${new Date(cart.lastUpdated).toLocaleString()}</td>
+                    <td>${statusBadge}</td>
+                    <td>${actions}</td>
+                `;
+                cartsTable.appendChild(row);
+            });
+        }
+
+        function viewCartDetails(cartId) {
+            if (!hasPermission('carts')) {
+                alert('You do not have permission to view cart details');
+                return;
+            }
+            
+            const cart = carts.find(c => c.id === cartId);
+            if (cart) {
+                let details = `Cart Details:\n\n`;
+                details += `ID: ${cart.id}\n`;
+                details += `Customer: ${cart.customerName}\n`;
+                details += `Status: ${cart.status}\n`;
+                details += `Last Updated: ${new Date(cart.lastUpdated).toLocaleString()}\n`;
+                details += `Total: ₹${cart.total.toFixed(2)}\n\n`;
+                details += `Items:\n`;
+                
+                if (cart.items && cart.items.length > 0) {
+                    cart.items.forEach(item => {
+                        details += `- ${item.quantity} × ${item.name} (₹${item.price.toFixed(2)})\n`;
+                    });
+                } else {
+                    details += `No items in cart\n`;
+                }
+                
+                alert(details);
+            }
+        }
+
+        // User management
+        function renderUsers() {
+            usersTable.innerHTML = '';
+            
+            if (!hasPermission('users')) {
+                usersTable.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="access-denied">
+                            <i class="fas fa-lock"></i>
+                            <h3>Access Denied</h3>
+                            <p>You do not have permission to view users</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            users.forEach(user => {
+                let statusBadge = '';
+                if (user.status === 'active') {
+                    statusBadge = '<span class="badge badge-success">Active</span>';
+                } else {
+                    statusBadge = '<span class="badge badge-danger">Inactive</span>';
+                }
+                
+                let actions = '';
+                if (hasPermission('users')) {
+                    actions = `
+                        <button class="action-btn edit-btn">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    `;
+                }
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.role}</td>
+                    <td>${new Date(user.joined).toLocaleDateString()}</td>
+                    <td>${statusBadge}</td>
+                    <td>${actions}</td>
+                `;
+                usersTable.appendChild(row);
+            });
+        }
+
+        // Recent bookings for dashboard
+        function renderRecentBookings() {
+            recentBookingsTable.innerHTML = '';
+            
+            // Sort by date (newest first) and take first 5
+            const recentBookings = [...bookings]
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 5);
+            
+            recentBookings.forEach(booking => {
+                const product = products.find(p => p.id === booking.productId);
+                let statusBadge = '';
+                if (booking.status === 'confirmed') {
+                    statusBadge = '<span class="badge badge-success">Confirmed</span>';
+                } else if (booking.status === 'pending') {
+                    statusBadge = '<span class="badge badge-warning">Pending</span>';
+                } else {
+                    statusBadge = '<span class="badge badge-danger">Cancelled</span>';
+                }
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${booking.id}</td>
+                    <td>${booking.customerName}</td>
+                    <td>${product ? product.name : booking.productName}</td>
+                    <td>${new Date(booking.date).toLocaleDateString()}</td>
+                    <td>₹${booking.amount.toFixed(2)}</td>
+                    <td>${statusBadge}</td>
+                `;
+                recentBookingsTable.appendChild(row);
+            });
+        }
+
+        // Dashboard stats
+        function renderDashboardStats() {
+            document.getElementById('total-products').textContent = products.length;
+            document.getElementById('total-bookings').textContent = bookings.length;
+            
+            const totalRevenue = bookings
+                .filter(b => b.status === 'confirmed')
+                .reduce((sum, booking) => sum + booking.amount, 0);
+            document.getElementById('total-revenue').textContent = `₹${totalRevenue.toFixed(2)}`;
+            
+            const activeCarts = carts.filter(c => c.status === 'active').length;
+            document.getElementById('active-carts').textContent = activeCarts;
+            
+            // Analytics stats
+            const monthlySales = bookings
+                .filter(b => b.status === 'confirmed' && new Date(b.date) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
+                .reduce((sum, booking) => sum + booking.amount, 0);
+            document.getElementById('monthly-sales').textContent = `₹${monthlySales.toFixed(2)}`;
+            
+            // Simple conversion rate calculation (bookings / (bookings + active carts))
+            const conversionRate = bookings.length / (bookings.length + activeCarts) * 100 || 0;
+            document.getElementById('conversion-rate').textContent = `${conversionRate.toFixed(1)}%`;
+            
+            // New customers (simplified)
+            document.getElementById('new-customers').textContent = users.filter(u => u.role === 'customer').length;
+            
+            // Top product
+            const topProduct = [...products].sort((a, b) => (b.bookings || 0) - (a.bookings || 0))[0];
+            document.getElementById('top-product').textContent = topProduct ? topProduct.name : '-';
+        }
+
+        // Charts
+        function initCharts() {
+            // Sales Chart
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            salesChart = new Chart(salesCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Sales (₹)',
+                        data: [12000, 19000, 15000, 18000, 22000, 17000],
+                        backgroundColor: 'rgba(67, 97, 238, 0.7)',
+                        borderColor: 'rgba(67, 97, 238, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            revenueChart = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [{
+                        label: 'Revenue (₹)',
+                        data: [5000, 7000, 6500, 8000],
+                        backgroundColor: 'rgba(76, 201, 240, 0.2)',
+                        borderColor: 'rgba(76, 201, 240, 1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Product Chart
+            const productCtx = document.getElementById('productChart').getContext('2d');
+            productChart = new Chart(productCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: products.map(p => p.name),
+                    datasets: [{
+                        data: products.map(p => p.bookings || 0),
+                        backgroundColor: [
+                            'rgba(67, 97, 238, 0.7)',
+                            'rgba(247, 37, 133, 0.7)',
+                            'rgba(76, 201, 240, 0.7)',
+                            'rgba(248, 150, 30, 0.7)',
+                            'rgba(63, 55, 201, 0.7)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateCharts() {
+            if (!hasPermission('analytics')) {
+                return;
+            }
+            
+            // Update sales chart with real data
+            const monthlyData = [0, 0, 0, 0, 0, 0]; // Last 6 months
+            bookings.forEach(booking => {
+                if (booking.status === 'confirmed') {
+                    const month = new Date(booking.date).getMonth();
+                    monthlyData[month] += booking.amount;
+                }
+            });
+            salesChart.data.datasets[0].data = monthlyData;
+            salesChart.update();
+            
+            // Update product chart
+            productChart.data.labels = products.map(p => p.name);
+            productChart.data.datasets[0].data = products.map(p => p.bookings || 0);
+            productChart.update();
+        }
+        
+        function updateChart(range) {
+            if (!hasPermission('analytics')) {
+                alert('You do not have permission to view analytics');
+                return;
+            }
+            
+            let labels, data;
+            
+            if (range === 'week') {
+                labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                data = [1200, 1900, 1500, 1800, 2200, 1700, 2000];
+            } else if (range === 'month') {
+                labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                data = [5000, 7000, 6500, 8000];
+            } else { // year
+                labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                data = [12000, 19000, 15000, 18000, 22000, 17000, 20000, 18000, 21000, 23000, 25000, 28000];
+            }
+            
+            revenueChart.data.labels = labels;
+            revenueChart.data.datasets[0].data = data;
+            revenueChart.update();
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = "login.html";
+        }
+    </script>
+</body>
+</html>
